@@ -1,0 +1,149 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+  padding: 0 18px;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.60);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 4px 20px rgba(31, 41, 55, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.appIcon {
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, rgba(111, 116, 255, 0.18) 0%, rgba(141, 121, 255, 0.14) 100%);
+  border: 1px solid rgba(111, 116, 255, 0.22);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.titleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.appName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(148, 163, 184, 0.28);
+  flex-shrink: 0;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, transform 120ms ease;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.btnSecondary {
+  background: rgba(255, 255, 255, 0.62);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: var(--text-secondary);
+}
+
+.btnSecondary:hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(148, 163, 184, 0.42);
+  color: var(--text-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(31, 41, 55, 0.08);
+}
+
+.btnAccent {
+  background: var(--accent-bg);
+  border-color: rgba(111, 116, 255, 0.22);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.btnAccent:hover {
+  background: rgba(111, 116, 255, 0.14);
+  border-color: rgba(111, 116, 255, 0.34);
+  color: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.runBtn {
+  background: linear-gradient(135deg, #6f74ff 0%, #5b63ff 100%);
+  color: #fff;
+  border-color: transparent;
+  font-weight: 600;
+  padding: 0 18px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 6px 18px rgba(98, 92, 255, 0.30), 0 2px 6px rgba(98, 92, 255, 0.18);
+  transition: box-shadow 160ms ease, transform 120ms ease, opacity 160ms ease;
+}
+
+.runBtn:hover {
+  box-shadow: 0 8px 22px rgba(98, 92, 255, 0.38), 0 4px 10px rgba(98, 92, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.runBtn:active {
+  transform: scale(0.97) translateY(0);
+  box-shadow: 0 2px 8px rgba(98, 92, 255, 0.20);
+}
+
+.runBtn:disabled {
+  opacity: 0.5;
+  transform: none;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.spinner {
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,247 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Panel header */
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 2px 8px;
+  flex-shrink: 0;
+}
+
+.panelTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.modelLabel {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  background: rgba(220, 228, 248, 0.50);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-family: var(--font-mono);
+  border: 1px solid var(--border-secondary);
+}
+
+/* States */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 48px 16px;
+  animation: fadeIn 180ms ease;
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border: 2.5px solid rgba(148, 163, 184, 0.28);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+.loadingText {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  text-align: center;
+  animation: fadeIn 200ms ease;
+}
+
+.emptyIcon {
+  font-size: 34px;
+  opacity: 0.18;
+}
+
+.emptyText {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  max-width: 200px;
+}
+
+/* Section card */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: fadeSlideUp 240ms ease both;
+}
+
+.cardHeader {
+  padding: 11px 13px 9px;
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.cardTitle {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.cardBody {
+  padding: 11px 13px;
+}
+
+/* Score gauge card */
+.scoreCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 13px;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  animation: fadeSlideUp 200ms ease both;
+}
+
+.scoreMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.metaLabel {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.metaValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  line-height: 1.2;
+}
+
+/* Active layers */
+.layersBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Score breakdown */
+.dimensions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Insight box */
+.insightBox {
+  background: var(--insight-bg);
+  border: 1px solid var(--insight-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeSlideUp 280ms ease both;
+}
+
+.insightHeader {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 13px 8px;
+  border-bottom: 1px solid rgba(121, 202, 143, 0.28);
+}
+
+.insightIcon {
+  font-size: 13px;
+}
+
+.insightTitle {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--insight-title);
+}
+
+.insight {
+  font-size: 12px;
+  line-height: 1.62;
+  color: var(--insight-text);
+  padding: 10px 13px 12px;
+}
+
+/* Model response (legacy — still referenced from old code) */
+.responseCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: fadeSlideUp 300ms ease both;
+}
+
+.responseBody {
+  padding: 0;
+  background: var(--bg-code);
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.response {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.68;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  padding: 12px 14px;
+  margin: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

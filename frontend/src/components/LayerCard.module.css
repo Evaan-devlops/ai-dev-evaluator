@@ -1,0 +1,31 @@
+.card {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(31, 41, 55, 0.06), 0 1px 4px rgba(31, 41, 55, 0.04);
+  overflow: hidden;
+  transition: box-shadow 200ms ease, border-color 200ms ease, opacity 220ms ease, transform 200ms ease, background 200ms ease;
+  animation: fadeSlideUp 280ms ease both;
+}
+
+.card:hover {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 8px 28px rgba(31, 41, 55, 0.09), 0 2px 8px rgba(31, 41, 55, 0.05);
+  transform: translateY(-1px);
+}
+
+.card.disabled {
+  opacity: 0.55;
+  filter: grayscale(0.15);
+}
+
+.card.disabled:hover {
+  opacity: 0.68;
+  transform: none;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,183 @@
+.header {
+  padding: 12px 13px 10px;
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+}
+
+.badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+  letter-spacing: -0.02em;
+  border: 1.5px solid transparent;
+}
+
+.titleGroup {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--text-primary);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+.description {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rightGroup {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+.tokenCount {
+  font-size: 10.5px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(220, 228, 248, 0.55);
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.tokenCountActive {
+  background: rgba(111, 116, 255, 0.10);
+  color: var(--accent);
+  border-color: rgba(111, 116, 255, 0.20);
+}
+
+/* iOS-style toggle */
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.toggleInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggleTrack {
+  width: 34px;
+  height: 19px;
+  background: rgba(180, 190, 210, 0.50);
+  border-radius: 10px;
+  transition: background 220ms ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.toggleTrack.on {
+  /* color set inline via layer accent */
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2.5px;
+  left: 2.5px;
+  width: 14px;
+  height: 14px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toggleTrack.on .toggleThumb {
+  transform: translateX(15px);
+}
+
+.toggleDisabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* Warning note */
+.noteRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 7px 0 3px;
+  padding: 6px 9px;
+  background: rgba(244, 166, 47, 0.10);
+  border-radius: 8px;
+  border: 1px solid rgba(244, 166, 47, 0.22);
+}
+
+.noteIcon {
+  font-size: 10.5px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  opacity: 0.80;
+}
+
+.noteText {
+  font-size: 10.5px;
+  color: #7a5400;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* View content button */
+.viewRow {
+  margin-top: 8px;
+}
+
+.viewBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 3px 6px;
+  border-radius: 7px;
+  transition: background 140ms, color 140ms;
+  font-family: inherit;
+}
+
+.viewBtn:hover {
+  background: rgba(111, 116, 255, 0.10);
+  color: var(--accent);
+}
+
+.viewIcon {
+  font-size: 12px;
+  line-height: 1;
+}

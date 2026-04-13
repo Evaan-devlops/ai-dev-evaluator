@@ -1,0 +1,118 @@
+.card {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 16px rgba(31, 41, 55, 0.06), 0 1px 4px rgba(31, 41, 55, 0.04);
+  overflow: hidden;
+  animation: fadeSlideUp 280ms ease both;
+}
+
+.cardHeader {
+  padding: 11px 13px 9px;
+  border-bottom: 1px solid rgba(220, 228, 248, 0.50);
+}
+
+.cardTitle {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1.5px solid transparent;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 150ms ease, border-color 150ms ease;
+  position: relative;
+}
+
+.option:hover {
+  background: rgba(220, 228, 248, 0.35);
+}
+
+.optionActive {
+  background: rgba(111, 116, 255, 0.08);
+  border-color: rgba(111, 116, 255, 0.28);
+}
+
+.optionActive:hover {
+  background: rgba(111, 116, 255, 0.12);
+}
+
+.optionIcon {
+  font-size: 16px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(220, 228, 248, 0.45);
+  border: 1px solid rgba(148, 163, 184, 0.20);
+}
+
+.optionActive .optionIcon {
+  background: rgba(111, 116, 255, 0.12);
+  border-color: rgba(111, 116, 255, 0.22);
+  color: var(--accent);
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.optionLabel {
+  font-size: 12.5px;
+  font-weight: 650;
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.optionActive .optionLabel {
+  color: var(--accent);
+}
+
+.optionDesc {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.check {
+  font-size: 11px;
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
