@@ -1,5 +1,7 @@
 import React from 'react'
 import type { RunResult } from '../types'
+import type { EvaluationParameters } from '../store/llmConfigStore'
+import { DEFAULT_EVALUATION_PARAMETERS } from '../store/llmConfigStore'
 import { ScoreGauge } from './ScoreGauge'
 import { ScoreDimensionBar } from './ScoreDimensionBar'
 import styles from './ResultsSidebar.module.css'
@@ -7,20 +9,15 @@ import styles from './ResultsSidebar.module.css'
 interface Props {
   result: RunResult | null
   isRunning: boolean
+  parameterLabels?: EvaluationParameters
 }
 
-const DIMENSION_LABELS: Record<string, string> = {
-  persona:         'Persona Adherence',
-  policy:          'Policy Accuracy',
-  empathy:         'Empathy & Tone',
-  context:         'Context Awareness',
-  actionability:   'Actionability',
-  personalization: 'Personalization',
-  hallucination:   'No Hallucination',
-  completeness:    'Completeness',
-}
+export function ResultsSidebar({ result, isRunning, parameterLabels }: Props): React.ReactElement {
+  const dimensionLabels = new Map(
+    [...DEFAULT_EVALUATION_PARAMETERS, ...(parameterLabels ?? [])].map((parameter) => [parameter.id, parameter.label]),
+  )
+  const dimensionMax = result?.score_max === 100 ? 10 : 5
 
-export function ResultsSidebar({ result, isRunning }: Props): React.ReactElement {
   return (
     <div className={styles.sidebar}>
       {/* Panel header */}
@@ -66,7 +63,7 @@ export function ResultsSidebar({ result, isRunning }: Props): React.ReactElement
           </div>
 
           {/* Score breakdown */}
-          <div className={styles.card}>
+          <div className={styles.card} title={result.insight}>
             <div className={styles.cardHeader}>
               <span className={styles.cardTitle}>Score Breakdown</span>
             </div>
@@ -75,9 +72,10 @@ export function ResultsSidebar({ result, isRunning }: Props): React.ReactElement
                 {(Object.entries(result.score_breakdown) as [string, number][]).map(([key, value]) => (
                   <ScoreDimensionBar
                     key={key}
-                    label={DIMENSION_LABELS[key] ?? key}
+                    label={dimensionLabels.get(key) ?? key}
                     score={value}
-                    max={5}
+                    max={dimensionMax}
+                    title={result.insight}
                   />
                 ))}
               </div>
@@ -91,6 +89,15 @@ export function ResultsSidebar({ result, isRunning }: Props): React.ReactElement
               <span className={styles.insightTitle}>Insight</span>
             </div>
             <p className={styles.insight}>{result.insight}</p>
+            {result.suggestions && result.suggestions.length > 0 && (
+              <div className={styles.suggestionList}>
+                {result.suggestions.map((suggestion, index) => (
+                  <div key={`${suggestion}-${index}`} className={styles.suggestionItem}>
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}

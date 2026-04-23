@@ -15,7 +15,7 @@ def score_run(layers: list[ContextLayerSchema]) -> RunScoreBreakdownSchema:
     """
     Deterministic rule-based scoring.
     Each dimension starts at 1 and gains points based on which layers are enabled.
-    Each dimension is capped at 5. Total (quality_score) max is 40.
+    Each dimension is returned on a 10-point base.
     """
     active = _active_set(layers)
     active_count = len(active)
@@ -76,14 +76,14 @@ def score_run(layers: list[ContextLayerSchema]) -> RunScoreBreakdownSchema:
     completeness = _cap(1 + completeness_bonus)
 
     return RunScoreBreakdownSchema(
-        persona_adherence=persona_adherence,
-        policy_accuracy=policy_accuracy,
-        empathy_tone=empathy_tone,
-        context_awareness=context_awareness,
-        actionability=actionability,
-        personalization=personalization,
-        no_hallucination=no_hallucination,
-        completeness=completeness,
+        persona_adherence=persona_adherence * 2,
+        policy_accuracy=policy_accuracy * 2,
+        empathy_tone=empathy_tone * 2,
+        context_awareness=context_awareness * 2,
+        actionability=actionability * 2,
+        personalization=personalization * 2,
+        no_hallucination=no_hallucination * 2,
+        completeness=completeness * 2,
     )
 
 

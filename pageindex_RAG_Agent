@@ -636,3 +636,8 @@ What I want from you:
 
 Do not ask me follow-up questions.
 Make sensible implementation choices and proceed.
+**************************************************
+ I installed rag_service/requirements.txt because asyncpg was missing. Pip reported global Python dependency conflicts with other installed packages. myRAG starts successfully in the foreground, but it did not stay running as a background process from this shell; start it with:
+
+cd c:\Users\91997\sampletesting\ai-dev-evaluator\rag_service
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8001

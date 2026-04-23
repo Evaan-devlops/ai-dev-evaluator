@@ -29,6 +29,28 @@ router = APIRouter(prefix="/api/v1/workbench", tags=["workbench"])
 # In-memory storage
 # ---------------------------------------------------------------------------
 
+def _scale_seed_score(score: int) -> int:
+    return round((score / 40) * 100)
+
+
+def _scale_seed_breakdown(raw: dict[str, int]) -> dict[str, int]:
+    return {key: min(10, value * 2) for key, value in raw.items()}
+
+
+def _score_total_100(breakdown: RunScoreBreakdownSchema) -> int:
+    total = (
+        breakdown.persona_adherence
+        + breakdown.policy_accuracy
+        + breakdown.empathy_tone
+        + breakdown.context_awareness
+        + breakdown.actionability
+        + breakdown.personalization
+        + breakdown.no_hallucination
+        + breakdown.completeness
+    )
+    return round((total / 80) * 100)
+
+
 def _build_default_layers() -> list[ContextLayerSchema]:
     return [ContextLayerSchema(**layer) for layer in DEFAULT_LAYERS]
 
@@ -40,9 +62,9 @@ def _build_seeded_runs() -> tuple[list[RunHistoryItemSchema], dict[str, RunResul
         result = RunResultSchema(
             run_id=run_data["run_id"],
             run_number=run_data["run_number"],
-            quality_score=run_data["quality_score"],
-            score_max=run_data["score_max"],
-            score_breakdown=RunScoreBreakdownSchema(**run_data["score_breakdown"]),
+            quality_score=_scale_seed_score(run_data["quality_score"]),
+            score_max=100,
+            score_breakdown=RunScoreBreakdownSchema(**_scale_seed_breakdown(run_data["score_breakdown"])),
             insight=run_data["insight"],
             llm_response=run_data["llm_response"],
             latency_ms=run_data["latency_ms"],
@@ -56,8 +78,8 @@ def _build_seeded_runs() -> tuple[list[RunHistoryItemSchema], dict[str, RunResul
                 run_id=run_data["run_id"],
                 run_number=run_data["run_number"],
                 active_layers=run_data["active_layers"],
-                quality_score=run_data["quality_score"],
-                score_max=run_data["score_max"],
+                quality_score=_scale_seed_score(run_data["quality_score"]),
+                score_max=100,
                 total_tokens=run_data["total_tokens"],
                 latency_ms=run_data["latency_ms"],
             )
@@ -104,16 +126,7 @@ def run_workbench(request: RunRequest) -> RunResultSchema:
         raise HTTPException(status_code=422, detail="At least one layer must be enabled")
 
     breakdown = score_run(request.layers)
-    quality_score = (
-        breakdown.persona_adherence
-        + breakdown.policy_accuracy
-        + breakdown.empathy_tone
-        + breakdown.context_awareness
-        + breakdown.actionability
-        + breakdown.personalization
-        + breakdown.no_hallucination
-        + breakdown.completeness
-    )
+    quality_score = _score_total_100(breakdown)
 
     active_set = {layer.id for layer in request.layers if layer.enabled}
     insight = build_insight(active_set)
@@ -133,7 +146,7 @@ def run_workbench(request: RunRequest) -> RunResultSchema:
         run_id=run_id,
         run_number=_run_counter,
         quality_score=quality_score,
-        score_max=40,
+        score_max=100,
         score_breakdown=breakdown,
         insight=insight,
         llm_response=llm_response,
@@ -148,7 +161,7 @@ def run_workbench(request: RunRequest) -> RunResultSchema:
         run_number=_run_counter,
         active_layers=active_layers,
         quality_score=quality_score,
-        score_max=40,
+        score_max=100,
         total_tokens=total_tokens,
         latency_ms=latency_ms,
     )

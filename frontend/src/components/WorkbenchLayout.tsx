@@ -3,6 +3,7 @@ import styles from './WorkbenchLayout.module.css'
 
 interface Props {
   toolbar: React.ReactNode
+  topPanel?: React.ReactNode
   leftPanel: React.ReactNode
   middlePanel: React.ReactNode
   rightPanel: React.ReactNode
@@ -11,6 +12,7 @@ interface Props {
 
 export function WorkbenchLayout({
   toolbar,
+  topPanel,
   leftPanel,
   middlePanel,
   rightPanel,
@@ -19,6 +21,7 @@ export function WorkbenchLayout({
   return (
     <div className={styles.root}>
       {toolbar}
+      {topPanel && <div className={styles.topPanel}>{topPanel}</div>}
       <div className={styles.content}>
         <aside className={styles.leftPanel}>{leftPanel}</aside>
         <main className={styles.middlePanel}>{middlePanel}</main>

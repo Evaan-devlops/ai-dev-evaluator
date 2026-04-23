@@ -3,6 +3,7 @@ import { useWorkbenchStore } from '../../store/workbenchStore'
 import { useLLMConfigStore } from '../../store/llmConfigStore'
 import { WorkbenchLayout } from '../../components/WorkbenchLayout'
 import { Toolbar } from '../../components/Toolbar'
+import { ContextBriefPanel } from '../../components/ContextBriefPanel'
 import { LayerCard } from '../../components/LayerCard'
 import { TokenBudgetBar } from '../../components/TokenBudgetBar'
 import { AssembledPromptPanel } from '../../components/AssembledPromptPanel'
@@ -11,7 +12,7 @@ import { RunHistoryTable } from '../../components/RunHistoryTable'
 import { ModelResponsePanel } from '../../components/ModelResponsePanel'
 import { LayerContentModal } from '../../components/LayerContentModal'
 import { ConfigureModal } from '../../components/ConfigureModal'
-import { CodingModeSelector } from '../../components/CodingModeSelector'
+import { uploadDocument } from '../../api/documentsApi'
 import type { LayerType } from '../../types'
 import styles from './WorkbenchPage.module.css'
 
@@ -34,14 +35,17 @@ export function WorkbenchPage(): React.ReactElement {
     assemble,
     run,
     selectRun,
-    resetDemo,
     clearError,
   } = useWorkbenchStore()
 
-  const { config: llmConfig, isConfigureOpen, codingMode, openConfigure, closeConfigure, saveConfig, setCodingMode } = useLLMConfigStore()
+  const { config: llmConfig, isConfigureOpen, configureInitialSection, openConfigure, openConfigurePrd, closeConfigure, saveConfig } = useLLMConfigStore()
 
   const [openLayerModalId, setOpenLayerModalId] = useState<LayerType | null>(null)
   const [historyCollapsed, setHistoryCollapsed] = useState(false)
+  const [isBriefOpen, setIsBriefOpen] = useState(false)
+  const [modelResponseCollapsed, setModelResponseCollapsed] = useState(false)
+  const [isUploadingDocument, setIsUploadingDocument] = useState(false)
+  const [uploadStatus, setUploadStatus] = useState<{ ok: boolean; message: string } | null>(null)
 
   const sortedLayers = [...layers].sort((a, b) => a.order - b.order)
   const enabledLayerCount = layers.filter((l) => l.enabled).length
@@ -50,7 +54,27 @@ export function WorkbenchPage(): React.ReactElement {
   const handleRun = async () => { await run() }
   const handleAssemble = async () => { await assemble(); setShowAssembledPrompt(true) }
   const handleSelectRun = (runId: number) => { void selectRun(runId) }
-  const handleResetDemo = async () => { await resetDemo() }
+  const handleUploadDocument = async (file: File) => {
+    setIsUploadingDocument(true)
+    setUploadStatus(null)
+    try {
+      const result = await uploadDocument(file, llmConfig)
+      if (result.document_id) {
+        saveConfig({ ...llmConfig, ragDocumentId: result.document_id })
+      }
+      setUploadStatus({
+        ok: result.ok,
+        message: result.message || `Uploaded ${file.name}`,
+      })
+    } catch (error) {
+      setUploadStatus({
+        ok: false,
+        message: (error as Error).message,
+      })
+    } finally {
+      setIsUploadingDocument(false)
+    }
+  }
 
   const openLayer = openLayerModalId
     ? layers.find((l) => l.id === openLayerModalId) ?? null
@@ -65,8 +89,13 @@ export function WorkbenchPage(): React.ReactElement {
       onAssemble={handleAssemble}
       onToggleAssembledPrompt={() => setShowAssembledPrompt(!showAssembledPrompt)}
       onConfigure={openConfigure}
+      onConfigurePrd={openConfigurePrd}
+      onUploadDocument={handleUploadDocument}
       totalTokens={totalTokens}
       enabledLayerCount={enabledLayerCount}
+      hasPrd={llmConfig.prd.trim().length > 0}
+      isUploadingDocument={isUploadingDocument}
+      uploadStatus={uploadStatus}
     />
   )
 
@@ -77,16 +106,15 @@ export function WorkbenchPage(): React.ReactElement {
         <div className={styles.panelHeaderRight}>
           <span className={styles.panelSub}>{enabledLayerCount}/6 active</span>
           <button
-            className={styles.resetBtn}
-            onClick={handleResetDemo}
+            className={styles.headerBtn}
+            onClick={() => setIsBriefOpen(true)}
             type="button"
-            title="Reset demo to seeded state"
+            title="Open context engineering brief"
           >
-            Reset Demo
+            Brief
           </button>
         </div>
       </div>
-      <CodingModeSelector selected={codingMode} onChange={setCodingMode} />
 
       {sortedLayers.map((layer, idx) => (
         <LayerCard
@@ -141,7 +169,12 @@ export function WorkbenchPage(): React.ReactElement {
       {/* Model Response + Run History */}
       <div className={styles.responseHistoryGroup}>
         {selectedRun && !isRunning && (
-          <ModelResponsePanel result={selectedRun} expanded={historyCollapsed} />
+          <ModelResponsePanel
+            result={selectedRun}
+            expanded={historyCollapsed}
+            collapsed={modelResponseCollapsed}
+            onToggleCollapsed={() => setModelResponseCollapsed((collapsed) => !collapsed)}
+          />
         )}
 
         <div className={`${styles.historySection}${historyCollapsed ? ` ${styles.historySectionCollapsed}` : ''}`}>
@@ -181,7 +214,11 @@ export function WorkbenchPage(): React.ReactElement {
   )
 
   const rightPanel = (
-    <ResultsSidebar result={selectedRun} isRunning={isRunning} />
+    <ResultsSidebar
+      result={selectedRun}
+      isRunning={isRunning}
+      parameterLabels={llmConfig.prdParameters}
+    />
   )
 
   return (
@@ -191,6 +228,11 @@ export function WorkbenchPage(): React.ReactElement {
         leftPanel={leftPanel}
         middlePanel={middlePanel}
         rightPanel={rightPanel}
+      />
+
+      <ContextBriefPanel
+        isOpen={isBriefOpen}
+        onClose={() => setIsBriefOpen(false)}
       />
 
       {openLayer && (
@@ -211,6 +253,7 @@ export function WorkbenchPage(): React.ReactElement {
         config={llmConfig}
         onSave={saveConfig}
         onClose={closeConfigure}
+        initialSection={configureInitialSection}
       />
     </>
   )

@@ -8,10 +8,10 @@ interface Props {
 
 function getGaugeColor(score: number, max: number): string {
   const pct = score / max
-  if (pct >= 0.85) return '#39B56A'
-  if (pct >= 0.65) return '#4C7DFF'
+  if (pct >= 0.85) return '#22C55E'
+  if (pct >= 0.65) return '#3B82F6'
   if (pct >= 0.40) return '#F59E0B'
-  return '#EF4444'
+  return '#F43F5E'
 }
 
 function getLabel(score: number, max: number): string {
@@ -62,12 +62,17 @@ export function ScoreGauge({ score, max }: Props): React.ReactElement {
   return (
     <div className={styles.container}>
       <svg width={112} height={80} className={styles.svg} viewBox="0 0 112 80">
+        <defs>
+          <filter id="scoreGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="5" stdDeviation="5" floodColor={color} floodOpacity="0.28" />
+          </filter>
+        </defs>
         {/* Track */}
         <path
           d={trackPath}
           fill="none"
-          stroke="#E7EAF3"
-          strokeWidth={7}
+          stroke="rgba(255,255,255,0.58)"
+          strokeWidth={9}
           strokeLinecap="round"
         />
         {/* Fill */}
@@ -76,8 +81,9 @@ export function ScoreGauge({ score, max }: Props): React.ReactElement {
             d={fillPath}
             fill="none"
             stroke={color}
-            strokeWidth={7}
+            strokeWidth={9}
             strokeLinecap="round"
+            filter="url(#scoreGlow)"
             style={{ transition: 'stroke-dashoffset 600ms ease' }}
           />
         )}

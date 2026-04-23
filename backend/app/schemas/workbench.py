@@ -21,14 +21,14 @@ class ContextLayerSchema(BaseModel):
 
 
 class RunScoreBreakdownSchema(BaseModel):
-    persona_adherence: int = Field(ge=0, le=5)
-    policy_accuracy: int = Field(ge=0, le=5)
-    empathy_tone: int = Field(ge=0, le=5)
-    context_awareness: int = Field(ge=0, le=5)
-    actionability: int = Field(ge=0, le=5)
-    personalization: int = Field(ge=0, le=5)
-    no_hallucination: int = Field(ge=0, le=5)
-    completeness: int = Field(ge=0, le=5)
+    persona_adherence: int = Field(ge=0, le=10)
+    policy_accuracy: int = Field(ge=0, le=10)
+    empathy_tone: int = Field(ge=0, le=10)
+    context_awareness: int = Field(ge=0, le=10)
+    actionability: int = Field(ge=0, le=10)
+    personalization: int = Field(ge=0, le=10)
+    no_hallucination: int = Field(ge=0, le=10)
+    completeness: int = Field(ge=0, le=10)
 
 
 class RunResultSchema(BaseModel):

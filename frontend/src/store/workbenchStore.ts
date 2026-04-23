@@ -1,53 +1,34 @@
 import { create } from 'zustand'
 import { workbenchApi } from '../api/workbenchApi'
-import { FALLBACK_LAYERS, FALLBACK_HISTORY, FALLBACK_BEST_RUN } from '../data/demoFallback'
+import { FALLBACK_BEST_RUN, FALLBACK_HISTORY, FALLBACK_LAYERS } from '../data/demoFallback'
+import { useLLMConfigStore } from './llmConfigStore'
+import type { DataSourceMode } from './llmConfigStore'
 import type {
   ApiEvaluateResponse,
-  ApiHistoryRow,
-  ApiLayerDTO,
   ContextLayer,
   LayerType,
   RunHistoryItem,
   RunResult,
 } from '../types'
+import {
+  assembleLayersLocally,
+  buildPreviewRunResult,
+  canRunPrdEvaluation,
+  computeLayerTokenUsage,
+  evaluateModelResponseWithPrd,
+  estimateTokens,
+  generateModelResponseFromConfig,
+  hydrateActualDataLayers,
+} from '../utils/contextRuntime'
 
-// ─── Layer accent colors (frontend constants) ────────────────────────────────
-const LAYER_COLORS: Record<LayerType, string> = {
-  system:    '#67C587',
-  user:      '#5B8DEF',
-  history:   '#8B7CFF',
-  knowledge: '#58C4DD',
-  tools:     '#F5B14C',
-  state:     '#E88AC6',
-}
-
-// Layers enabled by default on initial load
 const DEFAULT_ENABLED = new Set<LayerType>(['system', 'user', 'history'])
-
-// ─── Adapters ────────────────────────────────────────────────────────────────
-
-function apiLayerToContextLayer(dto: ApiLayerDTO, index: number): ContextLayer {
-  return {
-    id: dto.key,
-    title: dto.name,
-    description: dto.subtitle,
-    enabled: dto.always_on || DEFAULT_ENABLED.has(dto.key),
-    content: dto.content,
-    token_estimate: dto.tokens,
-    order: index,
-    collapsed: index > 1,
-    color: LAYER_COLORS[dto.key] ?? '#888',
-    warning: dto.warning,
-    always_on: dto.always_on,
-  }
-}
 
 function apiEvalToRunResult(r: ApiEvaluateResponse): RunResult {
   return {
     run_id: r.run_id,
     run_number: r.run_id,
     quality_score: r.score,
-    score_max: 40,
+    score_max: 100,
     score_breakdown: r.breakdown,
     insight: r.insight,
     llm_response: r.model_response,
@@ -59,46 +40,25 @@ function apiEvalToRunResult(r: ApiEvaluateResponse): RunResult {
   }
 }
 
-function apiHistoryRowToItem(row: ApiHistoryRow): RunHistoryItem {
-  return {
-    run_id: row.run_id,
-    run_number: row.run_id,
-    active_layers: row.active_layers,
-    quality_score: row.score,
-    score_max: 40,
-    total_tokens: row.tokens,
-    latency_ms: row.latency_ms,
-  }
+function cloneMockLayers(): ContextLayer[] {
+  return FALLBACK_LAYERS.map((layer) => ({ ...layer }))
 }
 
-/** Compute per-layer token map from enabled layers' stored estimates. */
-function computeTokens(layers: ContextLayer[]): {
-  perLayerTokens: Record<string, number>
-  totalTokens: number
-} {
-  const perLayerTokens: Record<string, number> = {}
-  let totalTokens = 0
-  for (const layer of layers) {
-    if (layer.enabled) {
-      perLayerTokens[layer.id] = layer.token_estimate
-      totalTokens += layer.token_estimate
-    }
-  }
-  return { perLayerTokens, totalTokens }
+function createManualLayers(): ContextLayer[] {
+  return FALLBACK_LAYERS.map((layer) => ({
+    ...layer,
+    enabled: layer.always_on || DEFAULT_ENABLED.has(layer.id),
+    content: '',
+    token_estimate: 0,
+    warning: undefined,
+  }))
 }
 
-/** Find the best (highest score) history item's run_id. */
-function bestRunId(history: RunHistoryItem[]): number | null {
-  if (history.length === 0) return null
-  return history.reduce((best, item) =>
-    item.quality_score > best.quality_score ? item : best,
-  ).run_id
+function getUserPrompt(layers: ContextLayer[]): string {
+  return layers.find((layer) => layer.id === 'user')?.content.trim() ?? ''
 }
-
-// ─── Store definition ────────────────────────────────────────────────────────
 
 interface WorkbenchStore {
-  // State
   layers: ContextLayer[]
   tokenBudgetMax: number
   assembledPrompt: string
@@ -110,8 +70,8 @@ interface WorkbenchStore {
   isAssembling: boolean
   showAssembledPrompt: boolean
   error: string | null
+  dataSource: DataSourceMode
 
-  // Actions
   toggleLayer: (id: LayerType) => void
   updateLayerContent: (id: LayerType, content: string) => void
   toggleLayerCollapse: (id: LayerType) => void
@@ -120,12 +80,11 @@ interface WorkbenchStore {
   assemble: () => Promise<void>
   run: () => Promise<void>
   selectRun: (runId: number) => Promise<void>
-  loadDefaults: () => Promise<void>
+  loadDefaults: (dataSource?: DataSourceMode) => Promise<void>
   resetDemo: () => Promise<void>
   clearError: () => void
 }
 
-// Local cache: full run results keyed by run_id
 const _runCache = new Map<number, RunResult>()
 
 export const useWorkbenchStore = create<WorkbenchStore>((set, get) => ({
@@ -140,26 +99,29 @@ export const useWorkbenchStore = create<WorkbenchStore>((set, get) => ({
   isAssembling: false,
   showAssembledPrompt: false,
   error: null,
+  dataSource: 'mock',
 
   clearError: () => set({ error: null }),
 
   toggleLayer: (id) => {
-    const layers = get().layers.map((l) =>
-      l.id === id && !l.always_on ? { ...l, enabled: !l.enabled } : l,
+    const layers = get().layers.map((layer) =>
+      layer.id === id && !layer.always_on ? { ...layer, enabled: !layer.enabled } : layer,
     )
-    const { perLayerTokens, totalTokens } = computeTokens(layers)
+    const { perLayerTokens, totalTokens } = computeLayerTokenUsage(layers)
     set({ layers, perLayerTokens, totalTokens })
   },
 
   updateLayerContent: (id, content) => {
-    const layers = get().layers.map((l) => (l.id === id ? { ...l, content } : l))
-    const { perLayerTokens, totalTokens } = computeTokens(layers)
+    const layers = get().layers.map((layer) =>
+      layer.id === id ? { ...layer, content, token_estimate: estimateTokens(content), warning: undefined } : layer,
+    )
+    const { perLayerTokens, totalTokens } = computeLayerTokenUsage(layers)
     set({ layers, perLayerTokens, totalTokens })
   },
 
   toggleLayerCollapse: (id) => {
-    const layers = get().layers.map((l) =>
-      l.id === id ? { ...l, collapsed: !l.collapsed } : l,
+    const layers = get().layers.map((layer) =>
+      layer.id === id ? { ...layer, collapsed: !layer.collapsed } : layer,
     )
     set({ layers })
   },
@@ -169,15 +131,49 @@ export const useWorkbenchStore = create<WorkbenchStore>((set, get) => ({
   setShowAssembledPrompt: (show) => set({ showAssembledPrompt: show }),
 
   assemble: async () => {
-    const enabledLayers = get().layers.filter((l) => l.enabled).map((l) => l.id)
+    const { dataSource, layers } = get()
+    const enabledLayers = layers.filter((layer) => layer.enabled).map((layer) => layer.id)
+
     if (enabledLayers.length === 0) {
-      set({ assembledPrompt: '' })
+      set({ assembledPrompt: '', error: 'Enable at least one layer before assembling.' })
       return
     }
+
+    if (dataSource === 'actual' && !getUserPrompt(layers)) {
+      set({ error: 'Enter a user prompt before assembling actual data connectors.' })
+      return
+    }
+
+    if (dataSource !== 'mock') {
+      set({ isAssembling: true, error: null })
+      try {
+        const config = useLLMConfigStore.getState().config
+        const nextLayers = dataSource === 'actual'
+          ? await hydrateActualDataLayers(layers, config)
+          : layers.map((layer) => ({
+              ...layer,
+              token_estimate: estimateTokens(layer.content),
+            }))
+
+        const { assembledPrompt, perLayerTokens, totalTokens } = assembleLayersLocally(nextLayers)
+        set({
+          layers: nextLayers,
+          assembledPrompt,
+          perLayerTokens,
+          totalTokens,
+          isAssembling: false,
+          error: null,
+        })
+      } catch (err) {
+        set({ isAssembling: false, error: (err as Error).message })
+      }
+      return
+    }
+
     set({ isAssembling: true, error: null })
     try {
       const result = await workbenchApi.assemble(enabledLayers)
-      const { perLayerTokens, totalTokens } = computeTokens(get().layers)
+      const { perLayerTokens, totalTokens } = computeLayerTokenUsage(get().layers)
       set({
         assembledPrompt: result.assembled_prompt,
         perLayerTokens,
@@ -190,9 +186,72 @@ export const useWorkbenchStore = create<WorkbenchStore>((set, get) => ({
   },
 
   run: async () => {
-    const enabledLayers = get().layers.filter((l) => l.enabled).map((l) => l.id)
+    const { dataSource, layers, runHistory } = get()
+    const enabledLayers = layers.filter((layer) => layer.enabled).map((layer) => layer.id)
+
     if (enabledLayers.length === 0) {
       set({ error: 'Enable at least one layer before running.' })
+      return
+    }
+
+    if (dataSource === 'actual' && !getUserPrompt(layers)) {
+      set({ error: 'Enter a user prompt before running actual data connectors.' })
+      return
+    }
+
+    if (dataSource !== 'mock') {
+      set({ isRunning: true, error: null })
+
+      try {
+        const config = useLLMConfigStore.getState().config
+        const nextLayers = dataSource === 'actual'
+          ? await hydrateActualDataLayers(layers, config)
+          : layers.map((layer) => ({
+              ...layer,
+              token_estimate: estimateTokens(layer.content),
+            }))
+        const { assembledPrompt, perLayerTokens, totalTokens } = assembleLayersLocally(nextLayers)
+        const modelResponse = await generateModelResponseFromConfig(getUserPrompt(nextLayers), config, assembledPrompt)
+        const evaluation = canRunPrdEvaluation(config)
+          ? await evaluateModelResponseWithPrd(config, nextLayers, getUserPrompt(nextLayers), modelResponse.text)
+          : undefined
+        const previewRun = buildPreviewRunResult(
+          nextLayers,
+          config,
+          assembledPrompt,
+          runHistory.length + 1,
+          modelResponse.text,
+          modelResponse.provider,
+          modelResponse.latencyMs,
+          evaluation,
+        )
+
+        _runCache.set(previewRun.run_id, previewRun)
+
+        const historyItem: RunHistoryItem = {
+          run_id: previewRun.run_id,
+          run_number: previewRun.run_number,
+          active_layers: previewRun.active_layers,
+          quality_score: previewRun.quality_score,
+          score_max: previewRun.score_max,
+          total_tokens: previewRun.total_tokens,
+          latency_ms: previewRun.latency_ms,
+        }
+
+        set((state) => ({
+          layers: nextLayers,
+          assembledPrompt,
+          perLayerTokens,
+          totalTokens,
+          runHistory: [...state.runHistory, historyItem],
+          selectedRun: previewRun,
+          isRunning: false,
+          error: null,
+        }))
+      } catch (err) {
+        set({ isRunning: false, error: (err as Error).message })
+      }
+
       return
     }
 
@@ -214,7 +273,7 @@ export const useWorkbenchStore = create<WorkbenchStore>((set, get) => ({
         latency_ms: result.latency_ms,
       }
 
-      const { perLayerTokens, totalTokens } = computeTokens(get().layers)
+      const { perLayerTokens, totalTokens } = computeLayerTokenUsage(get().layers)
 
       set((state) => ({
         runHistory: [...state.runHistory, historyItem],
@@ -230,86 +289,67 @@ export const useWorkbenchStore = create<WorkbenchStore>((set, get) => ({
   },
 
   selectRun: async (runId) => {
-    // Fast path: already in cache
     const cached = _runCache.get(runId)
     if (cached) {
       set({ selectedRun: cached })
       return
     }
-    // Fetch from API (supports seeded runs not yet in cache)
+
+    if (get().dataSource !== 'mock') return
+
     try {
       const evalResult = await workbenchApi.getRunDetails(runId)
       const result = apiEvalToRunResult(evalResult)
       _runCache.set(runId, result)
       set({ selectedRun: result })
     } catch {
-      // Silently ignore — run details unavailable
+      // Run details unavailable.
     }
   },
 
-  loadDefaults: async () => {
-    set({ error: null })
-    try {
-      // Fetch meta + history in parallel
-      const [meta, historyRows] = await Promise.all([
-        workbenchApi.getMeta(),
-        workbenchApi.getHistory(),
-      ])
+  loadDefaults: async (dataSource = 'mock') => {
+    set({ error: null, dataSource })
 
-      const layers = meta.layers.map((dto, i) => apiLayerToContextLayer(dto, i))
-      const { perLayerTokens, totalTokens } = computeTokens(layers)
-      const runHistory = historyRows.map(apiHistoryRowToItem)
-
-      // Find the best run and fetch its full details
-      const topId = bestRunId(runHistory)
-      let selectedRun: RunResult | null = null
-
-      if (topId !== null) {
-        try {
-          const evalResult = await workbenchApi.getRunDetails(topId)
-          selectedRun = apiEvalToRunResult(evalResult)
-          _runCache.set(topId, selectedRun)
-        } catch {
-          // Best run details unavailable — sidebar stays empty
-        }
-      }
-
-      set({
-        layers,
-        tokenBudgetMax: meta.max_budget,
-        perLayerTokens,
-        totalTokens,
-        runHistory,
-        selectedRun,
-      })
-    } catch {
-      // ── Fallback: backend unavailable — use client-side demo seed ──
-      const layers = FALLBACK_LAYERS
-      const { perLayerTokens, totalTokens } = computeTokens(layers)
-
+    if (dataSource !== 'mock') {
       _runCache.clear()
-      _runCache.set(FALLBACK_BEST_RUN.run_id, FALLBACK_BEST_RUN)
-
       set({
-        layers,
+        layers: createManualLayers(),
         tokenBudgetMax: 4000,
-        perLayerTokens,
-        totalTokens,
-        runHistory: FALLBACK_HISTORY,
-        selectedRun: FALLBACK_BEST_RUN,
-        error: null, // don't show error — fallback is seamless
+        assembledPrompt: '',
+        perLayerTokens: {},
+        totalTokens: 0,
+        runHistory: [],
+        selectedRun: null,
+        showAssembledPrompt: false,
+        isRunning: false,
+        isAssembling: false,
       })
+      return
     }
+
+    const layers = cloneMockLayers()
+    const { perLayerTokens, totalTokens } = computeLayerTokenUsage(layers)
+
+    _runCache.clear()
+    _runCache.set(FALLBACK_BEST_RUN.run_id, FALLBACK_BEST_RUN)
+
+    set({
+      layers,
+      tokenBudgetMax: 4000,
+      assembledPrompt: '',
+      perLayerTokens,
+      totalTokens,
+      runHistory: FALLBACK_HISTORY,
+      selectedRun: FALLBACK_BEST_RUN,
+      showAssembledPrompt: false,
+      isRunning: false,
+      isAssembling: false,
+      error: null,
+    })
   },
 
   resetDemo: async () => {
-    set({ error: null })
-    try {
-      await workbenchApi.resetHistory()
-      _runCache.clear()
-      await get().loadDefaults()
-    } catch (err) {
-      set({ error: (err as Error).message })
-    }
+    _runCache.clear()
+    await get().loadDefaults(get().dataSource)
   },
 }))

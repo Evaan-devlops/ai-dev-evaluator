@@ -1,34 +1,41 @@
 /* ─── Design Tokens ───────────────────────────────────────────────────────── */
 :root {
   /* Page background */
-  --bg-base: #eef4ff;
-  --bg-gradient: linear-gradient(135deg, #eef4ff 0%, #f6f4ff 45%, #f3fbff 100%);
+  --bg-base: #edf2f8;
+  --bg-gradient:
+    linear-gradient(135deg, rgba(206, 224, 244, 0.92) 0%, rgba(246, 248, 252, 0.94) 36%, rgba(231, 239, 232, 0.90) 68%, rgba(245, 238, 247, 0.88) 100%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.45) 0%, rgba(214, 229, 248, 0.32) 48%, rgba(255, 255, 255, 0.42) 100%);
 
   /* Glass surfaces */
-  --bg-card:         rgba(255, 255, 255, 0.72);
-  --bg-glass:        rgba(255, 255, 255, 0.65);
-  --bg-glass-strong: rgba(255, 255, 255, 0.82);
-  --bg-overlay:      rgba(220, 228, 248, 0.45);
-  --bg-input:        rgba(248, 250, 255, 0.90);
-  --bg-code:         rgba(243, 246, 251, 0.88);
+  --bg-card:         linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(250, 253, 255, 0.46) 100%);
+  --bg-glass:        rgba(255, 255, 255, 0.46);
+  --bg-glass-strong: rgba(255, 255, 255, 0.70);
+  --bg-overlay:      rgba(237, 242, 249, 0.46);
+  --bg-input:        rgba(255, 255, 255, 0.58);
+  --bg-code:         rgba(247, 250, 255, 0.58);
+  --glass-panel:     linear-gradient(145deg, rgba(255, 255, 255, 0.64) 0%, rgba(255, 255, 255, 0.34) 54%, rgba(246, 250, 255, 0.42) 100%);
+  --glass-panel-strong: linear-gradient(145deg, rgba(255, 255, 255, 0.76) 0%, rgba(255, 255, 255, 0.48) 100%);
+  --glass-highlight: rgba(255, 255, 255, 0.84);
+  --glass-shadow: 0 22px 70px rgba(28, 38, 58, 0.16), 0 6px 22px rgba(28, 38, 58, 0.08);
+  --glass-shadow-soft: 0 14px 44px rgba(28, 38, 58, 0.12), 0 4px 14px rgba(28, 38, 58, 0.06);
 
   /* Borders */
-  --border:           rgba(255, 255, 255, 0.48);
-  --border-secondary: rgba(148, 163, 184, 0.22);
-  --border-hover:     rgba(255, 255, 255, 0.72);
-  --border-focus:     #6f74ff;
+  --border:           rgba(255, 255, 255, 0.64);
+  --border-secondary: rgba(120, 136, 160, 0.18);
+  --border-hover:     rgba(255, 255, 255, 0.92);
+  --border-focus:     #1677ff;
 
   /* Text */
-  --text-primary:   #203047;
-  --text-secondary: #6f8097;
-  --text-muted:     #92a1b5;
+  --text-primary:   #182332;
+  --text-secondary: #586579;
+  --text-muted:     #8793a5;
   --text-inverse:   #ffffff;
 
   /* Accent / brand */
-  --accent:       #6f74ff;
-  --accent-hover: #5b63ff;
-  --accent-light: #8d79ff;
-  --accent-bg:    rgba(111, 116, 255, 0.09);
+  --accent:       #1677ff;
+  --accent-hover: #0561dd;
+  --accent-light: #69b6ff;
+  --accent-bg:    rgba(22, 119, 255, 0.10);
 
   /* Layer identity colors */
   --layer-system-dot:    #67c77a;
@@ -83,19 +90,19 @@
   --space-8: 32px;
 
   /* Radius */
-  --radius-sm:   10px;
-  --radius-md:   14px;
-  --radius-lg:   18px;
-  --radius-xl:   24px;
-  --radius-2xl:  28px;
+  --radius-sm:   12px;
+  --radius-md:   16px;
+  --radius-lg:   22px;
+  --radius-xl:   28px;
+  --radius-2xl:  32px;
   --radius-full: 999px;
 
   /* Shadows */
-  --shadow-card:       0 8px 24px rgba(31, 41, 55, 0.07), 0 2px 6px rgba(31, 41, 55, 0.04);
-  --shadow-card-hover: 0 14px 40px rgba(31, 41, 55, 0.10), 0 4px 10px rgba(31, 41, 55, 0.06);
-  --shadow-sidebar:    0 8px 32px rgba(31, 41, 55, 0.06);
-  --shadow-elevated:   0 20px 60px rgba(15, 23, 42, 0.16);
-  --shadow-modal:      0 24px 80px rgba(15, 23, 42, 0.20), 0 8px 24px rgba(15, 23, 42, 0.08);
+  --shadow-card:       0 18px 54px rgba(28, 38, 58, 0.12), 0 3px 12px rgba(28, 38, 58, 0.06), inset 0 1px 0 var(--glass-highlight);
+  --shadow-card-hover: 0 24px 68px rgba(28, 38, 58, 0.16), 0 6px 18px rgba(28, 38, 58, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  --shadow-sidebar:    var(--glass-shadow);
+  --shadow-elevated:   0 30px 90px rgba(15, 23, 42, 0.22), 0 10px 30px rgba(15, 23, 42, 0.10);
+  --shadow-modal:      0 34px 110px rgba(15, 23, 42, 0.24), 0 12px 36px rgba(15, 23, 42, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.86);
 
   /* Typography */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
@@ -125,6 +132,18 @@ body {
   line-height: 1.5;
 }
 
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.26) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0 1px, transparent 1px 100%);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.34), transparent 72%);
+}
+
 button {
   font-family: inherit;
   cursor: pointer;
@@ -137,10 +156,10 @@ textarea, input {
 }
 
 /* ─── Scrollbar ───────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 7px; height: 7px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.55); }
+::-webkit-scrollbar-thumb { background: rgba(120, 136, 160, 0.24); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(120, 136, 160, 0.40); background-clip: padding-box; }
 
 /* ─── Focus ───────────────────────────────────────────────────────────────── */
 :focus-visible {

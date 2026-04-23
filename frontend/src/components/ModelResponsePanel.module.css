@@ -4,8 +4,8 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
   flex-shrink: 0;
   animation: fadeSlideUp 240ms ease both;
   display: flex;
@@ -17,19 +17,41 @@
   min-height: 0;
 }
 
+.cardCollapsed {
+  flex: 0 0 auto;
+}
+
 .cardHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 15px 10px;
   border-bottom: 1px solid var(--border-secondary);
+  background: rgba(255, 255, 255, 0.20);
+  cursor: pointer;
+  user-select: none;
+  transition: background 140ms;
+}
+
+.cardCollapsed .cardHeader {
+  border-bottom: none;
+}
+
+.cardHeader:hover {
+  background: rgba(255, 255, 255, 0.34);
 }
 
 .cardTitle {
   font-size: 12.5px;
-  font-weight: 700;
+  font-weight: 760;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .metaChip {
@@ -37,14 +59,23 @@
   font-family: var(--font-mono);
   font-weight: 500;
   color: var(--text-muted);
-  background: rgba(220, 228, 248, 0.50);
+  background: rgba(255, 255, 255, 0.46);
   padding: 3px 9px;
   border-radius: var(--radius-full);
   border: 1px solid var(--border-secondary);
 }
 
+.chevron {
+  width: 18px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+}
+
 .responseBody {
-  background: rgba(243, 246, 251, 0.88);
+  background: rgba(247, 250, 255, 0.56);
   max-height: 260px;
   overflow-y: auto;
   flex: 1;

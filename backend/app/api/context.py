@@ -50,14 +50,14 @@ class ContextMetaResponse(BaseModel):
 
 
 class ScoreBreakdown(BaseModel):
-    persona: int = Field(ge=0, le=5)
-    policy: int = Field(ge=0, le=5)
-    empathy: int = Field(ge=0, le=5)
-    context: int = Field(ge=0, le=5)
-    actionability: int = Field(ge=0, le=5)
-    personalization: int = Field(ge=0, le=5)
-    hallucination: int = Field(ge=0, le=5)
-    completeness: int = Field(ge=0, le=5)
+    persona: int = Field(ge=0, le=10)
+    policy: int = Field(ge=0, le=10)
+    empathy: int = Field(ge=0, le=10)
+    context: int = Field(ge=0, le=10)
+    actionability: int = Field(ge=0, le=10)
+    personalization: int = Field(ge=0, le=10)
+    hallucination: int = Field(ge=0, le=10)
+    completeness: int = Field(ge=0, le=10)
 
 
 class EvaluateRequest(BaseModel):
@@ -96,12 +96,20 @@ class HistoryRow(BaseModel):
 # In-memory state (seeded on startup, reset-able)
 # ---------------------------------------------------------------------------
 
+def _scale_seed_score(score: int) -> int:
+    return round((score / 40) * 100)
+
+
+def _scale_seed_breakdown(raw: dict[str, int]) -> dict[str, int]:
+    return {key: min(10, value * 2) for key, value in raw.items()}
+
+
 def _build_history() -> List[HistoryRow]:
     return [
         HistoryRow(
             run_id=r["run_id"],
             active_layers=r["active_layers"],
-            score=r["score"],
+            score=_scale_seed_score(r["score"]),
             tokens=r["token_budget_used"],
             latency_ms=r["latency_ms"],
             provider=r["provider"],
@@ -121,8 +129,8 @@ def _build_details() -> dict[int, EvaluateResponse]:
             token_budget_max=r["token_budget_max"],
             assembled_prompt=r["assembled_prompt"],
             model_response=r["model_response"],
-            breakdown=ScoreBreakdown(**r["breakdown"]),
-            score=r["score"],
+            breakdown=ScoreBreakdown(**_scale_seed_breakdown(r["breakdown"])),
+            score=_scale_seed_score(r["score"]),
             latency_ms=r["latency_ms"],
             insight=r["insight"],
         )
@@ -175,7 +183,16 @@ def _score(active: List[str]) -> ScoreBreakdown:
         b["actionability"] = min(b["actionability"], 1)
         b["policy"] = min(b["policy"], 3)
 
-    return ScoreBreakdown(**b)
+    return ScoreBreakdown(**{key: min(10, value * 2) for key, value in b.items()})
+
+
+def _score_total(breakdown: ScoreBreakdown) -> int:
+    total = sum([
+        breakdown.persona, breakdown.policy, breakdown.empathy,
+        breakdown.context, breakdown.actionability, breakdown.personalization,
+        breakdown.hallucination, breakdown.completeness,
+    ])
+    return round((total / 80) * 100)
 
 
 def _mock_response(active: List[str]) -> str:
@@ -242,7 +259,7 @@ def _insight(active: List[str], score: int) -> str:
     if "state" in has:
         return ("Full context produces the strongest result: empathetic, policy-aware, personalized, "
                 "and action-oriented with realistic next actions.")
-    return f"Score {score}/40 — adding more context layers improves every dimension."
+    return f"Score {score}/100 - adding more context layers improves every dimension."
 
 
 def _latency(active: List[str]) -> int:
@@ -306,11 +323,7 @@ def evaluate(payload: EvaluateRequest) -> EvaluateResponse:
         raise HTTPException(status_code=400, detail="Token budget exceeded")
 
     breakdown = _score(active)
-    score = sum([
-        breakdown.persona, breakdown.policy, breakdown.empathy,
-        breakdown.context, breakdown.actionability, breakdown.personalization,
-        breakdown.hallucination, breakdown.completeness,
-    ])
+    score = _score_total(breakdown)
     response_text = _mock_response(active)
     insight_text = _insight(active, score)
     latency = _latency(active)

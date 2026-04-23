@@ -1,45 +1,78 @@
 .header {
-  padding: 12px 13px 10px;
+  padding: 13px;
 }
 
 .topRow {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   width: 100%;
 }
 
 .badge {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 13px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
+  flex-direction: column;
+  gap: 1px;
   flex-shrink: 0;
-  letter-spacing: -0.02em;
   border: 1.5px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70), 0 7px 18px rgba(28, 38, 58, 0.07);
+}
+
+.badgeNumber {
+  font-size: 10px;
+  font-weight: 820;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.layerIcon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.88;
 }
 
 .titleGroup {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  border-radius: 12px;
+  padding: 5px 7px;
+  margin: -5px -7px;
+  transition: background 140ms, color 140ms, transform 120ms;
+}
+
+.titleGroup:hover {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.titleGroup:active {
+  transform: scale(0.99);
 }
 
 .title {
+  display: block;
+  max-width: 100%;
   font-size: 12.5px;
-  font-weight: 650;
+  font-weight: 760;
   color: var(--text-primary);
   line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .description {
+  display: block;
+  max-width: 100%;
   font-size: 10.5px;
   color: var(--text-muted);
   line-height: 1.35;
@@ -61,17 +94,17 @@
   font-family: var(--font-mono);
   font-weight: 600;
   color: var(--text-muted);
-  background: rgba(220, 228, 248, 0.55);
+  background: rgba(255, 255, 255, 0.46);
   padding: 2px 7px;
   border-radius: 6px;
   white-space: nowrap;
-  border: 1px solid rgba(148, 163, 184, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.64);
 }
 
 .tokenCountActive {
-  background: rgba(111, 116, 255, 0.10);
+  background: rgba(22, 119, 255, 0.10);
   color: var(--accent);
-  border-color: rgba(111, 116, 255, 0.20);
+  border-color: rgba(22, 119, 255, 0.20);
 }
 
 /* iOS-style toggle */
@@ -93,11 +126,12 @@
 .toggleTrack {
   width: 34px;
   height: 19px;
-  background: rgba(180, 190, 210, 0.50);
+  background: rgba(150, 164, 184, 0.34);
   border-radius: 10px;
   transition: background 220ms ease;
   position: relative;
   flex-shrink: 0;
+  box-shadow: inset 0 1px 3px rgba(28, 38, 58, 0.14);
 }
 
 .toggleTrack.on {
@@ -112,7 +146,7 @@
   height: 14px;
   background: #fff;
   border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 7px rgba(28, 38, 58, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.92);
   transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -130,7 +164,7 @@
   display: flex;
   align-items: flex-start;
   gap: 5px;
-  margin: 7px 0 3px;
+  margin: 10px 0 1px 46px;
   padding: 6px 9px;
   background: rgba(244, 166, 47, 0.10);
   border-radius: 8px;
@@ -152,32 +186,3 @@
 }
 
 /* View content button */
-.viewRow {
-  margin-top: 8px;
-}
-
-.viewBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  padding: 3px 6px;
-  border-radius: 7px;
-  transition: background 140ms, color 140ms;
-  font-family: inherit;
-}
-
-.viewBtn:hover {
-  background: rgba(111, 116, 255, 0.10);
-  color: var(--accent);
-}
-
-.viewIcon {
-  font-size: 12px;
-  line-height: 1;
-}

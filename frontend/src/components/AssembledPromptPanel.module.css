@@ -1,5 +1,5 @@
 .container {
-  background: rgba(243, 246, 251, 0.88);
+  background: rgba(247, 250, 255, 0.54);
   max-height: 440px;
   overflow-y: auto;
   padding: 14px 16px;
@@ -62,9 +62,10 @@
   white-space: pre-wrap;
   word-break: break-word;
   padding: 8px 10px;
-  background: rgba(255, 255, 255, 0.60);
+  background: rgba(255, 255, 255, 0.48);
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(220, 228, 248, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.70);
 }
 
 @keyframes spin {

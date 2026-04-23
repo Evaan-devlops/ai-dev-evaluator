@@ -33,6 +33,64 @@ const LAYER_DOTS: Record<LayerType, string> = {
   state:     '#e58ab6',
 }
 
+const LAYER_ICON_LABELS: Record<LayerType, string> = {
+  system:    'System instructions',
+  user:      'User input',
+  history:   'Conversation history',
+  knowledge: 'Retrieved knowledge',
+  tools:     'Tool definitions',
+  state:     'State and memory',
+}
+
+function LayerIcon({ id }: { id: LayerType }): React.ReactElement {
+  const common = {
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    strokeWidth: 1.9,
+  }
+
+  switch (id) {
+    case 'system':
+      return (
+        <svg className={styles.layerIcon} viewBox="0 0 24 24" aria-hidden>
+          <path {...common} d="M5 8h14M5 16h14M8 5v14M16 5v14" />
+        </svg>
+      )
+    case 'user':
+      return (
+        <svg className={styles.layerIcon} viewBox="0 0 24 24" aria-hidden>
+          <path {...common} d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM5 20a7 7 0 0 1 14 0" />
+        </svg>
+      )
+    case 'history':
+      return (
+        <svg className={styles.layerIcon} viewBox="0 0 24 24" aria-hidden>
+          <path {...common} d="M4 12a8 8 0 1 0 2.3-5.6M4 5v5h5M12 8v5l3 2" />
+        </svg>
+      )
+    case 'knowledge':
+      return (
+        <svg className={styles.layerIcon} viewBox="0 0 24 24" aria-hidden>
+          <path {...common} d="M6 6c0-1.7 12-1.7 12 0v12c0 1.7-12 1.7-12 0V6ZM6 12c0 1.7 12 1.7 12 0M6 6c0 1.7 12 1.7 12 0" />
+        </svg>
+      )
+    case 'tools':
+      return (
+        <svg className={styles.layerIcon} viewBox="0 0 24 24" aria-hidden>
+          <path {...common} d="m14.5 6 3.5 3.5M5 19l5.5-5.5M13 5.5l5.5 5.5-7 7H6v-5.5l7-7Z" />
+        </svg>
+      )
+    case 'state':
+      return (
+        <svg className={styles.layerIcon} viewBox="0 0 24 24" aria-hidden>
+          <path {...common} d="M8 4h8v16H8V4ZM5 8h3M5 12h3M5 16h3M16 8h3M16 12h3M16 16h3M11 9h2M11 15h2" />
+        </svg>
+      )
+  }
+}
+
 export function LayerHeader({
   id,
   title,
@@ -51,21 +109,27 @@ export function LayerHeader({
   return (
     <div className={styles.header}>
       <div className={styles.topRow}>
-        {/* Numbered badge */}
         <div
           className={styles.badge}
           style={{ background: badgeColors.bg, color: badgeColors.text, borderColor: badgeColors.border }}
+          aria-label={`${layerIndex + 1}. ${LAYER_ICON_LABELS[id]}`}
+          title={LAYER_ICON_LABELS[id]}
         >
-          {layerIndex + 1}
+          <span className={styles.badgeNumber}>{layerIndex + 1}</span>
+          <LayerIcon id={id} />
         </div>
 
-        {/* Title group */}
-        <div className={styles.titleGroup}>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.description}>{description}</div>
-        </div>
+        <button
+          className={styles.titleGroup}
+          type="button"
+          onClick={onViewContent}
+          title={`Open ${title} content`}
+          aria-label={`Open ${title} content`}
+        >
+          <span className={styles.title}>{title}</span>
+          <span className={styles.description}>{description}</span>
+        </button>
 
-        {/* Right: token count + toggle */}
         <div className={styles.rightGroup}>
           {enabled && tokenCount > 0 && (
             <span className={`${styles.tokenCount} ${styles.tokenCountActive}`}>
@@ -91,21 +155,12 @@ export function LayerHeader({
         </div>
       </div>
 
-      {/* Warning note */}
-      {!enabled && warning && (
+      {warning && (
         <div className={styles.noteRow}>
-          <span className={styles.noteIcon}>⚠</span>
+          <span className={styles.noteIcon}>!</span>
           <span className={styles.noteText}>{warning}</span>
         </div>
       )}
-
-      {/* View content trigger */}
-      <div className={styles.viewRow}>
-        <button className={styles.viewBtn} onClick={onViewContent} type="button">
-          <span className={styles.viewIcon}>⊞</span>
-          View content
-        </button>
-      </div>
     </div>
   )
 }

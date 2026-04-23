@@ -1,7 +1,7 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 /* Panel header */
@@ -15,20 +15,20 @@
 
 .panelTitle {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 760;
   color: var(--text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .modelLabel {
   font-size: 10.5px;
   color: var(--text-muted);
-  background: rgba(220, 228, 248, 0.50);
+  background: rgba(255, 255, 255, 0.44);
   padding: 2px 8px;
   border-radius: var(--radius-full);
   font-weight: 500;
   font-family: var(--font-mono);
-  border: 1px solid var(--border-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.68);
 }
 
 /* States */
@@ -79,75 +79,94 @@
 
 /* Section card */
 .card {
-  background: var(--bg-card);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.36));
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 26px;
   overflow: hidden;
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 18px 54px rgba(28, 38, 58, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
   animation: fadeSlideUp 240ms ease both;
 }
 
 .cardHeader {
-  padding: 11px 13px 9px;
+  padding: 16px 18px 13px;
   border-bottom: 1px solid var(--border-secondary);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.14));
 }
 
 .cardTitle {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  color: #7d8898;
 }
 
 .cardBody {
-  padding: 11px 13px;
+  padding: 12px 14px 14px;
 }
 
 /* Score gauge card */
 .scoreCard {
-  background: var(--bg-card);
+  position: relative;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(34, 197, 94, 0.16), transparent 34%),
+    radial-gradient(circle at 92% 18%, rgba(59, 130, 246, 0.14), transparent 32%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.40));
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 13px;
-  box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border-radius: 28px;
+  padding: 18px 18px 17px;
+  box-shadow: 0 24px 70px rgba(28, 38, 58, 0.14), 0 8px 24px rgba(28, 38, 58, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
   display: flex;
-  gap: 13px;
+  gap: 18px;
   align-items: center;
   animation: fadeSlideUp 200ms ease both;
+  overflow: hidden;
+}
+
+.scoreCard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.46), transparent 38%, rgba(255, 255, 255, 0.18));
 }
 
 .scoreMeta {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .metaItem {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  align-items: baseline;
+  gap: 10px;
+  min-height: 28px;
 }
 
 .metaLabel {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--text-muted);
+  letter-spacing: 0.10em;
+  color: #8a94a4;
 }
 
 .metaValue {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   color: var(--text-primary);
   font-family: var(--font-mono);
   line-height: 1.2;
+  letter-spacing: 0;
 }
 
 /* Active layers */
@@ -161,17 +180,17 @@
 .dimensions {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 8px;
 }
 
 /* Insight box */
 .insightBox {
-  background: var(--insight-bg);
+  background: linear-gradient(145deg, rgba(226, 247, 232, 0.70), rgba(255, 255, 255, 0.34));
   border: 1px solid var(--insight-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
   animation: fadeSlideUp 280ms ease both;
 }
 
@@ -202,6 +221,23 @@
   padding: 10px 13px 12px;
 }
 
+.suggestionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 13px 13px;
+}
+
+.suggestionItem {
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--insight-text);
+  padding: 9px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.34);
+  border: 1px solid rgba(121, 202, 143, 0.20);
+}
+
 /* Model response (legacy — still referenced from old code) */
 .responseCard {
   background: var(--bg-card);
@@ -209,14 +245,14 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
   animation: fadeSlideUp 300ms ease both;
 }
 
 .responseBody {
   padding: 0;
-  background: var(--bg-code);
+  background: rgba(247, 250, 255, 0.54);
   max-height: 280px;
   overflow-y: auto;
 }

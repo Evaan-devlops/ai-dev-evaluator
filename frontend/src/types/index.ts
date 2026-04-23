@@ -19,16 +19,7 @@ export interface ContextLayer {
 
 // ─── Score breakdown — matches /api/context/evaluate breakdown fields ────────
 
-export interface RunScoreBreakdown {
-  persona: number
-  policy: number
-  empathy: number
-  context: number
-  actionability: number
-  personalization: number
-  hallucination: number
-  completeness: number
-}
+export type RunScoreBreakdown = Record<string, number>
 
 // ─── Run result (UI shape, adapted from EvaluateResponse) ───────────────────
 
@@ -36,10 +27,14 @@ export interface RunResult {
   run_id: number
   run_number: number          // same as run_id in new API
   quality_score: number       // = EvaluateResponse.score
-  score_max: number           // always 40
+  score_max: number           // 100 for current scoring
   score_breakdown: RunScoreBreakdown
   insight: string
   llm_response: string        // = EvaluateResponse.model_response
+  reference_response?: string
+  suggestions?: string[]
+  evaluation_context_layers?: LayerType[]
+  evaluation_context_summary?: Record<string, string>
   latency_ms: number
   total_tokens: number        // = EvaluateResponse.token_budget_used
   active_layers: LayerType[]
@@ -54,7 +49,7 @@ export interface RunHistoryItem {
   run_number: number
   active_layers: LayerType[]
   quality_score: number       // = HistoryRow.score
-  score_max: number           // always 40
+  score_max: number           // 100 for current scoring
   total_tokens: number        // = HistoryRow.tokens
   latency_ms: number
 }
@@ -78,16 +73,7 @@ export interface ApiContextMeta {
   layers: ApiLayerDTO[]
 }
 
-export interface ApiScoreBreakdown {
-  persona: number
-  policy: number
-  empathy: number
-  context: number
-  actionability: number
-  personalization: number
-  hallucination: number
-  completeness: number
-}
+export type ApiScoreBreakdown = Record<string, number>
 
 export interface ApiEvaluateResponse {
   run_id: number

@@ -154,27 +154,27 @@ export const FALLBACK_LAYERS: ContextLayer[] = [
 ]
 
 export const FALLBACK_HISTORY: RunHistoryItem[] = [
-  { run_id: 1, run_number: 1, active_layers: ['user'], quality_score: 18, score_max: 40, total_tokens: 110, latency_ms: 8200 },
-  { run_id: 2, run_number: 2, active_layers: ['system', 'user'], quality_score: 23, score_max: 40, total_tokens: 410, latency_ms: 5900 },
-  { run_id: 3, run_number: 3, active_layers: ['system', 'user', 'history'], quality_score: 28, score_max: 40, total_tokens: 810, latency_ms: 5700 },
-  { run_id: 4, run_number: 4, active_layers: ['system', 'user', 'history', 'knowledge', 'tools'], quality_score: 30, score_max: 40, total_tokens: 1610, latency_ms: 8200 },
-  { run_id: 5, run_number: 5, active_layers: ['system', 'user', 'history', 'knowledge', 'tools', 'state'], quality_score: 34, score_max: 40, total_tokens: 1810, latency_ms: 8900 },
+  { run_id: 1, run_number: 1, active_layers: ['user'], quality_score: 45, score_max: 100, total_tokens: 110, latency_ms: 8200 },
+  { run_id: 2, run_number: 2, active_layers: ['system', 'user'], quality_score: 58, score_max: 100, total_tokens: 410, latency_ms: 5900 },
+  { run_id: 3, run_number: 3, active_layers: ['system', 'user', 'history'], quality_score: 70, score_max: 100, total_tokens: 810, latency_ms: 5700 },
+  { run_id: 4, run_number: 4, active_layers: ['system', 'user', 'history', 'knowledge', 'tools'], quality_score: 75, score_max: 100, total_tokens: 1610, latency_ms: 8200 },
+  { run_id: 5, run_number: 5, active_layers: ['system', 'user', 'history', 'knowledge', 'tools', 'state'], quality_score: 85, score_max: 100, total_tokens: 1810, latency_ms: 8900 },
 ]
 
 export const FALLBACK_BEST_RUN: RunResult = {
   run_id: 5,
   run_number: 5,
-  quality_score: 34,
-  score_max: 40,
+  quality_score: 85,
+  score_max: 100,
   score_breakdown: {
-    persona: 5,
-    policy: 3,
-    empathy: 5,
-    context: 5,
-    actionability: 5,
-    personalization: 5,
-    hallucination: 2,
-    completeness: 4,
+    persona: 10,
+    policy: 6,
+    empathy: 10,
+    context: 10,
+    actionability: 10,
+    personalization: 10,
+    hallucination: 4,
+    completeness: 8,
   },
   insight:
     'Full context produces a highly personalized, policy-accurate, actionable response. ' +
